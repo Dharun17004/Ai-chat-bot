@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assignment - Chat Interface</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root { --primary: #2563eb; --bg: #f8fafc; --text: #1e293b; }
+        body { font-family: 'Inter', system-ui, sans-serif; background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        #chat-container { width: 95%; max-width: 800px; height: 85vh; background: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); display: flex; flex-direction: column; overflow: hidden; }
+        #chat-header { padding: 20px; background: var(--primary); color: white; text-align: center; font-weight: 600; font-size: 1.2rem; }
+        
+        /* NEW: Styles for the Control Buttons */
+        #controls { display: flex; justify-content: space-between; padding: 10px 20px; background: #e2e8f0; border-bottom: 1px solid #cbd5e1; }
+        .action-btn { background: white; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: #475569; transition: 0.2s; }
+        .action-btn:hover { background: #f1f5f9; color: var(--primary); }
+
+        #chat-history { flex-grow: 1; overflow-y: auto; padding: 25px; display: flex; flex-direction: column; gap: 20px; scroll-behavior: smooth; }
+        
+        /* Message Bubbles */
+        .message { padding: 12px 18px; border-radius: 12px; max-width: 85%; line-height: 1.6; font-size: 0.95rem; }
+        .user-msg { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .ai-msg { background: #f1f5f9; color: var(--text); align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid #e2e8f0; }
+        
+        /* Markdown Styling inside AI messages */
+        .ai-msg pre { background: #1e293b; color: #f8fafc; padding: 10px; border-radius: 6px; overflow-x: auto; font-size: 0.85rem; }
+        .ai-msg code { font-family: monospace; background: #e2e8f0; padding: 2px 4px; border-radius: 4px; }
+        
+        #input-area { padding: 20px; border-top: 1px solid #e2e8f0; display: flex; gap: 10px; }
+        #user-input { flex-grow: 1; padding: 14px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; transition: border 0.2s; }
+        #user-input:focus { border-color: var(--primary); }
+        #send-btn { background: var(--primary); color: white; border: none; padding: 0 24px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        #send-btn:hover { opacity: 0.9; }
+        #loading { display: none; padding: 0 25px 10px; font-size: 0.8rem; color: #64748b; }
+    </style>
+</head>
+<body>
+
+<div id="chat-container">
+    <div id="chat-header">Assignment: AI API Interface</div>
+    
+    <div id="controls">
+        <button class="action-btn" onclick="loadHistory()">📜 Load History</button>
+        <button class="action-btn" onclick="clearChat()">🗑️ Clear Chat</button>
+    </div>
+
+    <div id="chat-history">
+        <div class="message ai-msg">Hello! I'm your local AI agent. Ask me anything!</div>
+    </div>
+    
+    <div id="loading">Gemini is thinking...</div>
+    
+    <div id="input-area">
+        <input type="text" id="user-input" placeholder="Ask a question..." autocomplete="off">
+        <button id="send-btn" onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+    // Note: Change this to your Render URL later if you deploy!
+    const API_BASE_URL = "http://127.0.0.1:8000/api";
+    let chatMemory = []; // Conversation Context!
+
+    // Handle Enter Key
+    document.getElementById('user-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+
+    // --- 1. SEND MESSAGE LOGIC ---
+    async function sendMessage() {
+        const input = document.getElementById("user-input");
+        const text = input.value.trim();
+        if (!text) return;
+
+        addMessageToUI(text, "user-msg", false);
+        input.value = "";
+        document.getElementById("loading").style.display = "block";
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/generate`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prompt: text, history: chatMemory })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                addMessageToUI(data.ai_response, "ai-msg", true);
+                chatMemory.push({ role: "user", text: text });
+                chatMemory.push({ role: "ai", text: data.ai_response });
+            } else {
+                addMessageToUI("Error: " + data.detail, "ai-msg", false);
+            }
+        } catch (error) {
+            addMessageToUI("❌ Error connecting to Python server.", "ai-msg", false);
+        }
+        document.getElementById("loading").style.display = "none";
+    }
+
+    // --- 2. LOAD HISTORY LOGIC ---
+    async function loadHistory() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/history`);
+            const data = await response.json();
+            
+            if (response.ok && data.history.length > 0) {
+                const historyDiv = document.getElementById("chat-history");
+                historyDiv.innerHTML = ""; 
+                chatMemory = []; 
+                
+                data.history.forEach(msg => {
+                    const className = msg.role === "user" ? "user-msg" : "ai-msg";
+                    const isMarkdown = msg.role === "ai"; 
+                    addMessageToUI(msg.text, className, isMarkdown);
+                    chatMemory.push({ role: msg.role, text: msg.text });
+                });
+            } else {
+                alert("No history found in the database!");
+            }
+        } catch (error) {
+            console.error("Could not load history:", error);
+            alert("Error connecting to server to load history.");
+        }
+    }
+
+    // --- 3. CLEAR CHAT LOGIC ---
+    async function clearChat() {
+        if (!confirm("Are you sure you want to delete all chat history?")) return;
+
+        try {
+            await fetch(`${API_BASE_URL}/clear`, { method: "POST" });
+            
+            document.getElementById("chat-history").innerHTML = '<div class="message ai-msg">Memory wiped! How can I help you start fresh?</div>';
+            chatMemory = []; 
+            
+        } catch (error) {
+            alert("Error clearing chat from the server.");
+        }
+    }
+
+    // --- 4. UI HELPER FUNCTION ---
+    function addMessageToUI(text, className, isMarkdown) {
+        const history = document.getElementById("chat-history");
+        const div = document.createElement("div");
+        div.className = `message ${className}`;
+        
+        if (isMarkdown) {
+            div.innerHTML = marked.parse(text); 
+        } else {
+            div.innerText = text;
+        }
+        
+        history.appendChild(div);
+        history.scrollTop = history.scrollHeight;
+    }
+</script>
+
+</body>
+</html>

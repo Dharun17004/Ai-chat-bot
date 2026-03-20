@@ -1,0 +1,53 @@
+=========================================
+COMPANY OVERVIEW: SOLARTECH SOLUTIONS
+=========================================
+Founded: 2015
+Headquarters: Austin, Texas
+Mission: To provide affordable, high-efficiency solar energy systems for residential homes.
+Support Hours: Monday - Friday, 8:00 AM to 6:00 PM CST.
+Contact: support@solartech.com | 1-800-555-0199
+
+=========================================
+PRODUCT CATALOG
+=========================================
+1. Helios 500 Solar Panel
+- Type: Monocrystalline
+- Wattage: 400W per panel
+- Efficiency: 22.5%
+- Dimensions: 65 x 39 inches
+- Price: $350 per panel
+- Best for: Areas with high sunlight; maximum roof space efficiency.
+
+2. Luna Home Battery Storage
+- Capacity: 13.5 kWh
+- Chemistry: Lithium Iron Phosphate (LiFePO4)
+- Max Continuous Power: 5.8 kW
+- Price: $6,500
+- Best for: Storing excess daytime solar power for nighttime use or grid outages.
+
+3. Apollo Grid Inverter
+- Max Output: 7.6 kW
+- Efficiency: 98%
+- Price: $1,200
+- Note: Required for all Helios panel installations to convert DC to AC power.
+
+=========================================
+WARRANTY & RETURN POLICIES
+=========================================
+Panels (Helios): 25-year performance warranty. Guarantees 85% output capacity at year 25.
+Battery (Luna): 10-year warranty. 
+Inverter (Apollo): 12-year standard warranty.
+Returns: Customers can return uninstalled equipment within 30 days of delivery. There is a 15% restocking fee for all returned batteries. Custom-cut wiring cannot be returned.
+Transferability: Warranties are fully transferable to the new homeowner if the house is sold.
+
+=========================================
+COMMON TROUBLESHOOTING
+=========================================
+Issue: Inverter displays a blinking Red Light.
+Solution: This indicates a grid connection loss. The user should check their home's main electrical breaker. If the breaker is on, contact your local utility company.
+
+Issue: Error Code E-404 on the Apollo Inverter screen.
+Solution: The inverter has lost Wi-Fi connection. The customer needs to restart their home router and use the SolarTech mobile app to reconnect the inverter to the network.
+
+Issue: Luna Battery is not charging during the day.
+Solution: Verify that the solar panels are free of debris or heavy snow. If clear, force-restart the battery by holding the green power button for 10 seconds.
