@@ -51,7 +51,7 @@ def load_knowledge():
 COMPANY_KNOWLEDGE = load_knowledge()
 
 # --- SECURITY FIX: No hardcoded key fallback ---
-GEMINI_KEY = os.environ.get("GEMINI_API_KEY")
+GEMINI_KEY = os.environ.get("GEMINI_API_KEY","AIzaSyChfZnql4Yq9ixQYwyngoSYt8OD2ZivTkg")
 if not GEMINI_KEY:
     print("WARNING: No GEMINI_API_KEY found in environment variables!")
 
